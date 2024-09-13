@@ -24,7 +24,11 @@ class Folders extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            if (folderProvider.isDeletionActive) {
+              folderProvider.deactivateDeletion();
+            } else {
+              Navigator.pop(context);
+            }
           },
           icon: const Icon(
             Icons.arrow_back_ios,
@@ -95,6 +99,10 @@ class Folders extends StatelessWidget {
                               itemBuilder: (_, i) {
                                 return GestureDetector(
                                   onTap: () {
+                                    if (i == 0 ||
+                                        i == user.user.folders.length - 1) {
+                                      return;
+                                    }
                                     if (folder.isDeletionActive) {
                                       folder.setSelectFolderForDeletion(i);
                                       return;
@@ -102,6 +110,10 @@ class Folders extends StatelessWidget {
                                     notes.selectedFolderIndex(i);
                                   },
                                   onLongPress: () {
+                                    if (i == 0 ||
+                                        i == user.user.folders.length - 1) {
+                                      return;
+                                    }
                                     folder.activateDeletion();
                                     folder.setSelectFolderForDeletion(i);
                                   },
@@ -134,7 +146,8 @@ class Folders extends StatelessWidget {
                                         ),
                                         if (folder.isDeletionActive &&
                                             folder.selectedFolderForDeletion
-                                                .contains(i))
+                                                .contains(i) &&
+                                            i != 0)
                                           Container(
                                             height: 20,
                                             width: 20,
@@ -152,7 +165,9 @@ class Folders extends StatelessWidget {
                                           ),
                                         if (folder.isDeletionActive &&
                                             !folder.selectedFolderForDeletion
-                                                .contains(i))
+                                                .contains(i) &&
+                                            i != 0 &&
+                                            i != user.user.folders.length - 1)
                                           Container(
                                             height: 20,
                                             width: 20,
@@ -161,7 +176,9 @@ class Folders extends StatelessWidget {
                                               color: Color(0xFF242424),
                                             ),
                                           ),
-                                        if (!folder.isDeletionActive)
+                                        if (!folder.isDeletionActive ||
+                                            i == 0 ||
+                                            i == user.user.folders.length - 1)
                                           Container(
                                             height: 20,
                                             width: 20,

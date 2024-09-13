@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:notes/common/auth.dart';
@@ -100,9 +99,9 @@ class _CreateNewFolderState extends State<CreateNewFolder> {
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        if (Provider.of<UserProvider>(context, listen: false)
-                            .user
-                            .folders
+                        final up =
+                            Provider.of<UserProvider>(context, listen: false);
+                        if (up.user.folders
                             .contains(_folderNameController.text.trim())) {
                           Fluttertoast.showToast(msg: 'Folder already exists');
                           Navigator.pop(context);
@@ -111,13 +110,25 @@ class _CreateNewFolderState extends State<CreateNewFolder> {
                           return;
                         }
                         if (_folderNameController.text.isNotEmpty) {
+                          List<String> updatedList = [];
+                          if (up.user.folders.length == 1) {
+                            updatedList = [
+                              ...up.user.folders,
+                              _folderNameController.text.trim(),
+                              "Uncategorized"
+                            ];
+                          } else {
+                            updatedList = [
+                              ...up.user.folders,
+                            ];
+                            updatedList.insert(up.user.folders.length - 2,
+                                _folderNameController.text.trim());
+                          }
                           await fireStore
                               .collection('notesMaker')
                               .doc(Auth.uid)
                               .update({
-                            'folders': FieldValue.arrayUnion([
-                              _folderNameController.text.trim(),
-                            ])
+                            'folders': updatedList,
                           }).then((value) {
                             Navigator.pop(context);
                           }).catchError((error) {
