@@ -3,11 +3,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:notes/common/app_colors.dart';
 import 'package:notes/common/app_vectors.dart';
 import 'package:notes/screens/auth/providers/user_provider.dart';
+import 'package:notes/screens/home/providers/notes_provider.dart';
 import 'package:notes/screens/home/providers/todos_provider.dart';
 import 'package:notes/screens/home/screen/notes.dart';
 import 'package:notes/screens/home/screen/todos.dart';
 import 'package:notes/screens/home/widgets/create_new_todo.dart';
 import 'package:provider/provider.dart';
+
+import '../widgets/create_new_note.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     Provider.of<UserProvider>(context, listen: false).getUserData();
+    Provider.of<NotesProvider>(context, listen: false).getNotes();
     Provider.of<TodosProvider>(context, listen: false).getTodos();
     _tabController = TabController(length: 2, vsync: this);
   }
@@ -108,7 +112,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         shape: const CircleBorder(),
         onPressed: () {
           if (_tabController.index == 0) {
-            return;
+            Navigator.push(context, MaterialPageRoute(builder: (_) {
+              return CreateNewNote(
+                dateTime: DateTime.now(),
+                title: '',
+                content: '',
+                id: '',
+                createdAt: DateTime.now(),
+              );
+            }));
           } else {
             showModalBottomSheet(
                 context: context,
